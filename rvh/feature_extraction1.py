@@ -10,8 +10,6 @@ from rvh import *
 # Run this after running `python -m rvh.load_data_to_redis data/
 inputdir = sys.argv[1]
 
-
-
 def _get_features_for_line(line):
     # Get features from previously loaded maps in redis
     bidder_id = line['bidder_id']
@@ -25,7 +23,7 @@ def _get_features_for_line(line):
     row['num_unique_devices'] = r.pfcount(uniq_col_key('device', bidder_id))
     row['num_unique_ips'] = r.pfcount(uniq_col_key('ip', bidder_id))
     row['num_unique_urls'] = r.pfcount(uniq_col_key('url', bidder_id))
-    if 'outcome' in row:
+    if 'outcome' in line:
         row['label'] = int(float(line['outcome']))
     return row
 
@@ -47,8 +45,6 @@ def generate_features(inputfile, outputfile, train=True):
     csvwriter.writeheader()
     for line in csvreader:
         row = _get_features_for_line(line)
-        if not train:
-            print(row)
         csvwriter.writerow(row)
 
     of.close()
