@@ -3,8 +3,11 @@ import os
 import csv
 from rvh import *
 
+# Usage
+# python -m rvh.load_data_to_redis data/
 inputdir = sys.argv[1]
 
+# Clears db completely
 r.flushdb()
 
 bid_file = os.path.join(inputdir, 'bids.csv')

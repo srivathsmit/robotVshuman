@@ -5,7 +5,12 @@ import redis
 import csv
 from rvh import *
 
+# Usage:
+# python -m rvh.feature_extraction1 data/
+# Run this after running `python -m rvh.load_data_to_redis data/
 inputdir = sys.argv[1]
+
+
 
 def _get_features_for_line(line):
     # Get features from previously loaded maps in redis
