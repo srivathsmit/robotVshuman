@@ -11,7 +11,7 @@ from sklearn import preprocessing
 
 
 def get_model():
-    return LogisticRegressionModel()
+    return LogRegAndSvmModel()
 
 
 def main():
@@ -25,8 +25,7 @@ def main():
     data = pd.read_csv(inputfile)
     y = np.array(data.loc[:, 'outcome'].astype('int'))
     data.drop(['outcome', 'bidder_id'], inplace=True, axis=1)
-    data = data.astype(float)
-    X = preprocess_features(data)
+    X = data.astype(float).as_matrix()
     model = get_model()
     model.fit(X, y)
 
@@ -34,8 +33,7 @@ def main():
     test_data = pd.read_csv(testfile)
     bidder_id = test_data.loc[:, 'bidder_id']
     test_data.drop('bidder_id', inplace=True, axis=1)
-    test_data = test_data.astype(float)
-    test_X = preprocess_features(test_data)
+    test_X = test_data.astype(float).as_matrix()
     predictions = model.predict(test_X)
 
     # Write submission file

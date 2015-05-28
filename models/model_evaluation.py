@@ -11,7 +11,7 @@ from models.common import *
 
 
 def get_model():
-    return SvmModel()
+    return LogRegAndSvmModel()
 
 
 def shuffle(df):
@@ -27,7 +27,7 @@ def cross_validation(model, X, y, n_cv=5):
     print(cvs.mean(), cvs.std())
 
 
-def bootstrap(model, X, y, n_iter=50):
+def bootstrap(model, X, y, n_iter=100):
     auc = []
     full_idx = set(range(X.shape[0]))
     for i in xrange(n_iter):
@@ -48,8 +48,7 @@ def main():
     data = shuffle(data)
     y = np.array(data.loc[:, 'outcome'].astype('int'))
     data.drop(['outcome', 'bidder_id'], inplace=True, axis=1)
-    data = data.astype(float)
-    X = preprocess_features(data)
+    X = data.astype(float).as_matrix()
 
     # Evaluate model
     cross_validation(get_model(), X, y)

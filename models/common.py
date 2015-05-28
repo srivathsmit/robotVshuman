@@ -8,12 +8,6 @@ from sklearn.metrics import roc_auc_score
 from sklearn.svm import SVC, LinearSVC
 
 
-def preprocess_features(data):
-    scaler = preprocessing.StandardScaler().fit(data)
-    X = scaler.transform(data)
-    return X
-
-
 class RocScorerMixin(object):
     def score(self, X_test, y_test):
         return roc_auc_score(y_test, self.predict(X_test))
@@ -24,9 +18,12 @@ class LogisticRegressionModel(BaseEstimator, RocScorerMixin):
         self.lr = LogisticRegression(penalty='l1')
 
     def fit(self, X, y):
+        self.scaler = preprocessing.StandardScaler().fit(X)
+        X = self.scaler.transform(X)
         self.lr.fit(X, y)
 
     def predict(self, X_test):
+        X_test = self.scaler.transform(X_test)
         probabilities = self.lr.predict_proba(X_test)[:,1]
         return probabilities
 
@@ -36,10 +33,14 @@ class SvmModel(BaseEstimator, RocScorerMixin):
         self.model = SVC(C=1e-5, gamma=100)
 
     def fit(self, X, y):
+        self.scaler = preprocessing.StandardScaler().fit(X)
+        X = self.scaler.transform(X)
         self.model.fit(X, y)
 
     def predict(self, X_test):
+        X_test = self.scaler.transform(X_test)
         scores = self.model.decision_function(X_test)
+        scores.shape = scores.shape[0]
         return scores
 
 
@@ -48,10 +49,14 @@ class LinearSvmModel(BaseEstimator, RocScorerMixin):
         self.model = LinearSVC(C=0.0000000001, loss='l1', penalty='l2')
 
     def fit(self, X, y):
+        self.scaler = preprocessing.StandardScaler().fit(X)
+        X = self.scaler.transform(X)
         self.model.fit(X, y)
 
     def predict(self, X_test):
+        X_test = self.scaler.transform(X_test)
         scores = self.model.decision_function(X_test)
+        scores.shape = scores.shape[0]
         return scores
 
 class LogRegAndSvmModel(BaseEstimator, RocScorerMixin):
@@ -60,6 +65,8 @@ class LogRegAndSvmModel(BaseEstimator, RocScorerMixin):
         self.lr_model = LogisticRegression(penalty='l1')
 
     def fit(self, X, y):
+        self.scaler = preprocessing.StandardScaler().fit(X)
+        X = self.scaler.transform(X)
         self.svm_model.fit(X, y)
         self.lr_model.fit(X, y)
         svm_scores = self.svm_model.decision_function(X)
@@ -70,6 +77,7 @@ class LogRegAndSvmModel(BaseEstimator, RocScorerMixin):
         self.lr_sd = np.std(lr_scores)
 
     def predict(self, X_test):
+        X_test = self.scaler.transform(X_test)
         svm_scores = (self.svm_model.decision_function(X_test) - self.svm_mean)/self.svm_sd
         lr_scores = (self.lr_model.predict_proba(X_test)[:,1] - self.lr_mean)/self.lr_sd
         svm_scores.shape = svm_scores.shape[0]
