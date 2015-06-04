@@ -12,20 +12,6 @@ import sys
 from collections import defaultdict
 
 
-CATEGORIES = [
-    'jewelry',
-    'mobile',
-    'office_equipment',
-    'books_and_music',
-    'sporting_goods',
-    'home_goods',
-    'computers',
-    'auto_parts',
-    'clothing',
-    'furniture',
-]
-
-
 def get_features_for_bidder(bid_info, bidder_attributes, bids_per_auction):
     """Get features for a single bidder.
 
